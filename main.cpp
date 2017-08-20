@@ -25,7 +25,7 @@ T deref(T *address) {
 
   nread = process_vm_readv(pid, local, 1, remote, 1, 0);
   if (nread != sizeof(T)) {
-    std::cout << "Failed to read player unit struct address" << std::endl;
+    std::cout << "Remote address: " << std::hex << address << std::dec << std::endl;
   }
   
   return variable;
