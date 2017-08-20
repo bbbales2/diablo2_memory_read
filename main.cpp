@@ -6,17 +6,37 @@
 #include <unistd.h>
 #include <cinttypes>
 #include <iostream>
+//#include <sys/wait.h>
+//#include <fcntl.h>
+//#include <string>
+//#include <sys/ptrace.h>
 #include "d2structs.hpp"
+#include "json/src/json.hpp"
 
+using json = nlohmann::json;
+
+//std::string memFilename;
 pid_t pid;
 
 template<typename T>
 T deref(T *address) {
+  T variable;
+
+  /* ptrace version -- works but still need root
+  int mem_fd = open(memFilename.c_str(), O_RDONLY);
+  ptrace(PTRACE_ATTACH, pid, NULL, NULL);
+  waitpid(pid, NULL, 0);
+  lseek(mem_fd, (long)address, SEEK_SET);
+  read(mem_fd, (void *)&variable, sizeof(T));
+  ptrace(PTRACE_DETACH, pid, NULL, NULL);
+  close(mem_fd);
+
+  return variable;
+  */
+
   struct iovec local[1];
   struct iovec remote[1];
   ssize_t nread;
-
-  T variable;
 
   local[0].iov_base = &variable;
   local[0].iov_len = sizeof(T);
@@ -33,22 +53,30 @@ T deref(T *address) {
 
 int main(int argc, char **argv) {
 
-  if(argc != 2) {
+  if(argc < 2) {
     std::cout << "Must pass in pid of Diablo client" << std::endl;
     return 0;
   }
-  
+
+  //memFilename = std::string("/proc/") + std::string(argv[1]) + std::string("/mem");
   pid = atoi(argv[1]);
   
   UnitAny *unitPtr = deref((UnitAny **)0x7A6A70);
 
-  std::cout << "Player unit struct address: " << std::hex << unitPtr << std::dec << std::endl;
-
   while(1) {
     UnitAny unit = deref(unitPtr);
-    
-    std::cout << "Seed: " << unit.dwSeed[0] << ", Y: " << unit.wY << std::endl;
+    Path path = deref(unit.pPath);
 
+    json j = {
+      {"x", path.xPos},
+      {"y", path.yPos}
+    };
+  
+    std::cout << j.dump(4) << std::endl;
+
+    if(argc == 2)
+      break;
+    
     usleep(100000);
   }
 
