@@ -11,7 +11,7 @@
 pid_t pid;
 
 template<typename T>
-T get(void *address) {
+T deref(T *address) {
   struct iovec local[1];
   struct iovec remote[1];
   ssize_t nread;
@@ -39,13 +39,13 @@ int main(int argc, char **argv) {
   }
   
   pid = atoi(argv[1]);
-
-  auto unitPtr = get<UnitAny *>((void *)0x7A6A70);
+  
+  UnitAny *unitPtr = deref((UnitAny **)0x7A6A70);
 
   std::cout << "Player unit struct address: " << std::hex << unitPtr << std::dec << std::endl;
 
   while(1) {
-    auto unit = get<UnitAny>(unitPtr);
+    UnitAny unit = deref(unitPtr);
     
     std::cout << "Seed: " << unit.dwSeed[0] << ", Y: " << unit.wY << std::endl;
 
