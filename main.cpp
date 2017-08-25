@@ -66,10 +66,13 @@ int main(int argc, char **argv) {
   while(1) {
     UnitAny unit = deref(unitPtr);
     Path path = deref(unit.pPath);
-
+    StatList stats = deref(unit.pStats);
+    uint32_t xp = deref(stats.StatVec.pStats + 11).dwStatValue;
+    
     json j = {
       {"x", path.xPos},
-      {"y", path.yPos}
+      {"y", path.yPos},
+      {"xp", xp}
     };
   
     std::cout << j.dump(4) << std::endl;
