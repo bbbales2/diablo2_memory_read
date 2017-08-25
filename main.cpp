@@ -11,6 +11,7 @@
 //#include <string>
 //#include <sys/ptrace.h>
 #include "d2structs.hpp"
+#include "d2constants.hpp"
 #include "json/src/json.hpp"
 
 using json = nlohmann::json;
@@ -67,12 +68,37 @@ int main(int argc, char **argv) {
     UnitAny unit = deref(unitPtr);
     Path path = deref(unit.pPath);
     StatList stats = deref(unit.pStats);
-    uint32_t xp = deref(stats.StatVec.pStats + 11).dwStatValue;
-    
+
+	uint32_t xp = 0;
+	uint32_t hp = 0;
+	uint32_t gold = 0;
+
+	for (int i = 0; i < stats.StatVec.wCount; i++)
+	{
+		Stat cur_stat = deref(stats.StatVec.pStats + i);
+		switch (cur_stat.wStatIndex)
+		{
+		case STAT_EXP:
+			xp = cur_stat.dwStatValue;
+			break;
+		case STAT_GOLD:
+			gold = cur_stat.dwStatValue;
+			break;
+		case STAT_HP:
+			hp = cur_stat.dwStatValue;
+			break;
+		default:
+			// Not a stat we're interested in.
+			break;
+		}
+	}
+
     json j = {
       {"x", path.xPos},
       {"y", path.yPos},
-      {"xp", xp}
+      {"xp", xp},
+	  {"gold", gold},
+	  {"hp": hp},
     };
   
     std::cout << j.dump(4) << std::endl;
