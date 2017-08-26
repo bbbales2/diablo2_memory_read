@@ -98,7 +98,7 @@ int main(int argc, char **argv) {
       {"y", path.yPos},
       {"xp", xp},
 	  {"gold", gold},
-	  {"hp": hp},
+	  {"hp", hp},
     };
   
     std::cout << j.dump(4) << std::endl;
