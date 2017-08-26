@@ -46,7 +46,8 @@ T deref(T *address) {
 
   nread = process_vm_readv(pid, local, 1, remote, 1, 0);
   if (nread != sizeof(T)) {
-    std::cout << "Remote address: " << std::hex << address << std::dec << std::endl;
+    std::cout << "Remote address read failed: " << std::hex << address << std::dec << std::endl;
+    exit(-1);
   }
   
   return variable;
