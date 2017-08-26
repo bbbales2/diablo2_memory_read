@@ -49,7 +49,7 @@ T deref(T *address) {
     std::cout << "Remote address read failed: " << std::hex << address << std::dec << std::endl;
     exit(-1);
   }
-  
+
   return variable;
 }
 
@@ -62,7 +62,7 @@ int main(int argc, char **argv) {
 
   //memFilename = std::string("/proc/") + std::string(argv[1]) + std::string("/mem");
   pid = atoi(argv[1]);
-  
+
   UnitAny *unitPtr = deref((UnitAny **)0x7A6A70);
 
   while(1) {
@@ -70,43 +70,46 @@ int main(int argc, char **argv) {
     Path path = deref(unit.pPath);
     StatList stats = deref(unit.pStats);
 
-	uint32_t xp = 0;
-	uint32_t hp = 0;
-	uint32_t gold = 0;
+    uint32_t xp = 0;
+    uint32_t hp = 0;
+    uint32_t gold = 0;
 
-	for (int i = 0; i < stats.StatVec.wCount; i++)
-	{
-		Stat cur_stat = deref(stats.StatVec.pStats + i);
-		switch (cur_stat.wStatIndex)
-		{
-		case STAT_EXP:
-			xp = cur_stat.dwStatValue;
-			break;
-		case STAT_GOLD:
-			gold = cur_stat.dwStatValue;
-			break;
-		case STAT_HP:
-			hp = cur_stat.dwStatValue;
-			break;
-		default:
-			// Not a stat we're interested in.
-			break;
-		}
-	}
+    for (int i = 0; i < stats.StatVec.wCount; i++) {
+      Stat cur_stat = deref(stats.StatVec.pStats + i);
+      switch (cur_stat.wStatIndex) {
+      case STAT_EXP:
+        xp = cur_stat.dwStatValue;
+        break;
+      case STAT_GOLD:
+        gold = cur_stat.dwStatValue;
+        break;
+      case STAT_HP:
+        hp = cur_stat.dwStatValue;
+        break;
+      default:
+        // Not a stat we're interested in.
+        break;
+      }
+    }
 
     json j = {
       {"x", path.xPos},
       {"y", path.yPos},
       {"xp", xp},
-	  {"gold", gold},
-	  {"hp", hp},
+      {"gold", gold},
+      {"hp", hp},
+      {"xTarget", path.xTarget},
+      {"yTarget", path.yTarget},
+      {"lastUnitClicked", path.pTargetUnit != NULL},
+      {"lastUnitTypeClicked", path.dwTargetType},
+      {"lastUnitIdClicked", path.dwTargetId}
     };
-  
+
     std::cout << j.dump(4) << std::endl;
 
     if(argc == 2)
       break;
-    
+
     usleep(100000);
   }
 
