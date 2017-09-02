@@ -102,7 +102,8 @@ int main(int argc, char **argv) {
       {"yTarget", path.yTarget},
       {"lastUnitClicked", path.pTargetUnit != NULL},
       {"lastUnitTypeClicked", path.dwTargetType},
-      {"lastUnitIdClicked", path.dwTargetId}
+      {"lastUnitIdClicked", path.dwTargetId},
+      {"mode", unit.dwMode}
     };
 
     std::cout << j.dump(4) << std::endl;
